@@ -9,3 +9,12 @@ The EnergyTake is the amount of energy that the HPWH would need to consume to he
 ![et_temp](https://user-images.githubusercontent.com/56623148/169650900-8e2e3f1a-be4f-4302-8aec-5ce903b20741.png)
 
 Energytake is used to represent the average tank temperature. The EnergyTake is calculated internally wihtin the source code. Users will only see the tank temperature. However, GridLAB-D users may see the EnergyTake values by simply typing ''energytake'' within water heater object.
+
+## Testing the Developed HPWH Model:
+This repository also includes a testing file that allows user to test the developed HPWH model. Once this repository is cloned, run the "hpwh_testing.glm" file by using the following command:
+
+
+```gridlabd hpwh_testing.glm```
+
+
+Make sure the "wd_1.csv" file is in the same direcotory as the "hpwh_testing.glm" file.
