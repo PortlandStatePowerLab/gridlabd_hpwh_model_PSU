@@ -1,0 +1,228 @@
+//Modified by Midrar Adham
+
+/////////////////////////////////////////////
+// BEGIN
+/////////////////////////////////////////////
+
+clock {
+    starttime '2021-12-25 00:00:00';
+    stoptime '2021-12-31 00:10:00';
+    //timezone PST8;
+}
+
+module powerflow;
+module residential {
+    implicit_enduses NONE;
+}
+module market;
+module tape;
+
+class player {
+    double value;
+}
+
+
+object overhead_line_conductor:100 {
+	geometric_mean_radius 0.0244;
+	resistance 0.306;
+}
+
+object overhead_line_conductor:101 {
+	geometric_mean_radius 0.00814;
+	resistance 0.592;
+}
+
+object line_spacing:200 {
+	distance_AB 2.5;
+	distance_BC 4.5;
+	distance_AC 7.0;
+	distance_AN 5.656854;
+	distance_BN 4.272002;
+	distance_CN 5.0;
+}
+
+object line_configuration:300 {
+	conductor_A overhead_line_conductor:100;
+	conductor_B overhead_line_conductor:100;
+	conductor_C overhead_line_conductor:100;
+	conductor_N overhead_line_conductor:101;
+	spacing line_spacing:200;
+}
+
+object transformer_configuration:400 {
+	connect_type 1;
+	power_rating 6000;
+	powerA_rating 2000;
+	powerB_rating 2000;
+	powerC_rating 2000;
+	primary_voltage 12470;
+	secondary_voltage 4160;
+	resistance 0.01;
+	reactance 0.06;
+}
+
+object node {
+	name node1;
+	phases "ABCN";
+	voltage_A +7199.558+0.000j;
+	voltage_B -3599.779-6235.000j;
+	voltage_C -3599.779+6235.000j;
+	nominal_voltage 7200;
+}
+
+object overhead_line:12 {
+	phases "ABCN";
+	from node1;
+	to node2;
+	length 2000;
+	configuration line_configuration:300;
+}
+
+object node {
+	name node2;
+	phases "ABCN";
+	voltage_A +7199.558+0.000j;
+	voltage_B -3599.779-6235.000j;
+	voltage_C -3599.779+6235.000j;
+	nominal_voltage 7200;
+}
+
+object transformer:23 {
+	phases "ABCN";
+	from node2;
+	to node3;
+	configuration transformer_configuration:400;
+}
+
+object node {
+	name node3;
+	phases "ABCN";
+	voltage_A +2401.777+0.000j;
+	voltage_B -1200.889-2080.000j;
+	voltage_C -1200.889+2080.000j;
+	nominal_voltage 2400;
+}
+
+object overhead_line:34 {
+	phases "ABCN";
+	from node3;
+    to node4;
+//	to load4;
+	length 2500;
+	configuration line_configuration:300;
+}
+object node {
+	name node4;
+	phases "ABCN";
+	voltage_A +2401.777+0.000j;
+	voltage_B -1200.889-2080.000j;
+	voltage_C -1200.889+2080.000j;
+	nominal_voltage 2400;
+}
+
+
+///////////////////////////////
+// TRIPLEX OBJECTS
+///////////////////////////////
+
+    ///////////////////////////////
+    // CONFIGURATIONS
+    ///////////////////////////////
+
+object triplex_line_conductor {
+    name tp_line_conductor;
+    resistance 0.97;
+    geometric_mean_radius 0.0111;
+};
+
+object triplex_line_configuration {
+    name triplex_line_configuration_1;
+    conductor_1 tp_line_conductor;
+    conductor_2 tp_line_conductor;
+    conductor_N tp_line_conductor;
+    insulation_thickness 0.08;
+    diameter 0.368;
+}
+
+object transformer_configuration {
+    name CS_config;
+    connect_type SINGLE_PHASE_CENTER_TAPPED;
+    install_type POLETOP;
+    powerC_rating 75;
+    primary_voltage 2401;
+    secondary_voltage 120.000;
+    impedance 0.006+0.0136j;
+}
+
+    ///////////////////////////////
+    // Triplex Lines, Nodes, and Transformers
+    ///////////////////////////////
+
+object transformer {
+	name center_tap_1; 
+	phases CS; 
+	from node4; 
+	to trip_node1; 
+	configuration CS_config;
+}
+
+object triplex_node {
+	name trip_node1; 
+	phases CS; 
+	nominal_voltage 120;        
+}
+
+object triplex_line {
+	name trip_line1; 
+	phases CS; 
+	from trip_node1;
+	to trip_meter1; 
+	length 0; 
+	configuration triplex_line_configuration_1;
+}
+
+object triplex_meter {
+    name trip_meter1;
+    phases CS;
+    nominal_voltage 120;
+}
+object recorder {
+    interval 60;
+    parent trip_meter1;
+    property measured_real_power;
+    file "recorder_data_meter.csv";
+    }
+
+
+object house {
+    name house1;
+    breaker_amps 30;
+    parent trip_meter1;
+
+    object waterheater {
+        name wh1;
+        location INSIDE;
+        temperature 120.0;
+        water_demand 0;
+	    heat_mode HEAT_PUMP;
+        heating_element_capacity 0.0 kW;
+        thermostat_deadband 4;
+        inlet_water_temperature 60;
+        tank_setpoint 119;
+        tank_UA 3.3;
+        tank_volume 50;
+        object recorder {
+            interval 60;
+            parent wh1;
+            property energytake,temperature,is_waterheater_on,power.real;
+            file "wh_idle_losses.csv";
+        };
+    };
+}
+object player {
+	name wd;
+	file "wd_1.csv";
+};
+///////////////////////////////
+// END
+///////////////////////////////
