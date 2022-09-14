@@ -19,15 +19,7 @@ The developed HPWH model uses already defined parameters from the original GridL
      - **compressor_max_threshold:** This variable defines the maximum threshold for the compressor. If the water temperature (Tw) drops below $\approx$ 103F (equivalent to 2 kWh), the compressor turns off and the resistive heating element triggers. 
      - **heating_element_min_threshold:** Once the resistive heating element triggers, it does **NOT** turn off until the water temperature (Tw) reaches $\approx$ 110F (equivalent to 1.1 kWh).
 
-## Testing the Developed HPWH Model:
-This PR also includes a testing file that allows user to test the developed HPWH model. Once this repository is cloned, run the "hpwh_testing.glm" file by using the following command:
 
-
-
-```gridlabd hpwh_testing.glm```
-
-
-Make sure the "wd_1.csv" file is in the same directory as the "hpwh_testing.glm" file.
 ## Testing the Developed HPWH Model:
 This repository also includes a testing file that allows user to test the developed HPWH model. Once this repository is cloned, run the "hpwh_testing.glm" file by using the following command:
 
